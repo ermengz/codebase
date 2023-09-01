@@ -47,6 +47,78 @@ def huggingface_test():
     print(f"infer done")
     
 
+def net_demo():
+    """
+        构建网络的三种基本方式：
+        # nn.Sequential() 
+        # nn.ModuleList()
+        # nn.ModuleDict()
+        相同点：都在nn模块下
+        不同点：sequential函数, 内置了forward功能
+                modulelist和moduledict需要写forward函数
+        他们之间的转换关系为：modulelist --> sequential
+                            moduledict --> sequential
+    """
+    import torch
+    import torch.nn as nn
+
+    dumy_data = torch.rand([3,224,224])
+    dumy_data = dumy_data.unsqueeze(0)
+    print(f'dumy_data = {dumy_data.shape}')
+    net1 = nn.Sequential(nn.Conv2d(3,32,3,3),
+                        nn.BatchNorm2d(32),
+                        nn.ReLU()
+                        )
+    print(f"net1:{net1}")
+    output1 = net1(dumy_data)
+    print(f"nn.Sequential, output shape:{output1.shape}")
+
+    class netM2(nn.Module):
+        def __init__(self, *args, **kwargs) -> None:
+            super(netM2,self).__init__(*args, **kwargs)
+
+            self.block = nn.ModuleList([nn.Conv2d(3,32,3,3),
+                                        nn.BatchNorm2d(32),
+                                        nn.ReLU()])
+        def forward(self,x):
+            for layer in self.block:
+                x = layer(x)
+            return x
+    net2 = netM2()
+    print(f"net2:{net2}")
+    output2 = net2(dumy_data)
+    print(f"nn.ModuleList, output shape:{output2.shape}")
+
+    class netM3(nn.Module):
+        def __init__(self, *args, **kwargs) -> None:
+            super(netM3,self).__init__(*args, **kwargs)
+
+            self.block = nn.ModuleDict({"conv":nn.Conv2d(3,32,3,3),
+                                        "bn":nn.BatchNorm2d(32),
+                                        "relu":nn.ReLU()})
+        def forward(self,x):
+            for layer in self.block.values() :
+                x = layer(x)
+            return x
+    net3 = netM3()
+    print(f"net3:{net3}")
+    output3 = net3(dumy_data)
+    print(f"nn.ModuleDict, output shape:{output3.shape}")
+
+    # 转换关系
+    module_Dict = nn.ModuleDict({
+                                'conv': nn.Conv2d(10, 10, 3),
+                                'pool': nn.MaxPool2d(3)
+                                })
+    net4 = nn.Sequential(*module_Dict.values())
+    module_Dict=nn.ModuleList([nn.Linear(32,64),nn.ReLU()])
+    net5 = nn.Sequential(*module_Dict)
+    print(f"net4:{net4}")
+    print(f"net5:{net5}")
+
 if __name__ =="__main__":
     # check_cuda()
-    huggingface_test()
+    # huggingface_test()
+    print(f"start {'*'*20}")
+    net_demo()
+    print(f"end {'*'*20}")
