@@ -49,12 +49,12 @@ def huggingface_test():
 
 def net_demo():
     """
-        构建网络的三种基本方式：
+        构建网络的三种基本方式, 模型容器：
         # nn.Sequential() 
         # nn.ModuleList()
         # nn.ModuleDict()
-        相同点：都在nn模块下
-        不同点：sequential函数, 内置了forward功能
+        相同点: 都在nn模块下
+        不同点: sequential函数, 内置了forward功能
                 modulelist和moduledict需要写forward函数
         他们之间的转换关系为：modulelist --> sequential
                             moduledict --> sequential
